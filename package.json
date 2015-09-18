@@ -1,0 +1,13 @@
+{
+  "name": "EREParser",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.4.2",
+    "cheerio": "^0.19.0",
+    "moment": "^2.10.6",
+    "request": "^2.62.0"
+  }
+}
