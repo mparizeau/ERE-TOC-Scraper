@@ -9,6 +9,8 @@ function parseHTML(body) {
 	var posts = [];
 	$('.post-meta').each(function(i, element) {
 		var $this = $(this);
+		// id is of the form post-XXXX
+		var postId = $this.attr('id').split('-')[1];
 		var titleLink = $this.find('h1 a');
 		var originallyPosted = $this.find('#bte_opp small').text();
 		var postDate;
@@ -26,7 +28,8 @@ function parseHTML(body) {
 		posts.push({
 			title: titleLink.attr('title'),
 			link: titleLink.attr('href'),
-			originallyPosted: postDate
+			originallyPosted: postDate,
+			id: postId
 		});
 	});
 
@@ -37,7 +40,6 @@ function requestPage(pageIndex, callback) {
 	request('http://earlyretirementextreme.com/page/' + pageIndex, function(error, response, body) {
 		if (!error && response.statusCode === 200) {
 			callback(null, parseHTML(body));
-			console.log("Finished Page " + pageIndex);
 		} else if (error) {
 			// if there's an error e.g. socket hang up then retry
 			console.log("retrying " + pageIndex);
@@ -73,6 +75,7 @@ async.until(
 		async.parallel(requests, function(err, results) {
 			hasError = err;
 			currentIndex += parallelCount;
+			console.log("finished " + (currentIndex  - 1));
 
 			results.forEach(function(posts) {
 				posts && posts.forEach(function(post) {
@@ -84,7 +87,9 @@ async.until(
 	},
 	function() {
 		finalPosts.sort(function(a, b) {
-			return a.originallyPosted - b.originallyPosted;
+			var diff = a.originallyPosted - b.originallyPosted;
+			// sort by id if they were posted at the exact same time
+			return (diff === 0) ? (a.id - b.id) : diff;
 		});
 		fs.writeFile('results.txt', JSON.stringify(finalPosts));
 	}
