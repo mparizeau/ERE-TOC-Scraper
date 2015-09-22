@@ -4,6 +4,10 @@
   "description": "",
   "author": "Matt Parizeau",
   "license": "ISC",
+  "scripts": {
+      "start": "node main.js",
+      "format": "node main.js -f"
+  },
   "dependencies": {
     "async": "^1.4.2",
     "cheerio": "^0.19.0",
