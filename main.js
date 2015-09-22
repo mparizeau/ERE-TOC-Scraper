@@ -3,6 +3,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 var moment = require('moment');
 var async = require('async');
+var formatHTML = require('./format');
 
 function parseHTML(body) {
 	var $ = cheerio.load(body);
@@ -91,6 +92,9 @@ async.until(
 			// sort by id if they were posted at the exact same time
 			return (diff === 0) ? (a.id - b.id) : diff;
 		});
-		fs.writeFile('results.txt', JSON.stringify(finalPosts));
+		fs.writeFileSync('results.txt', JSON.stringify(finalPosts));
+
+		var html = formatHTML(finalPosts);
+		fs.writeFileSync('results.html', html);
 	}
 );

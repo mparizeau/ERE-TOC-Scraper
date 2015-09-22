@@ -1,13 +1,14 @@
 {
-  "name": "EREParser",
+  "name": "ERE-TOC-Scraper",
   "version": "1.0.0",
   "description": "",
-  "author": "",
+  "author": "Matt Parizeau",
   "license": "ISC",
   "dependencies": {
     "async": "^1.4.2",
     "cheerio": "^0.19.0",
     "moment": "^2.10.6",
-    "request": "^2.62.0"
+    "request": "^2.62.0",
+    "underscore": "^1.8.3"
   }
 }
