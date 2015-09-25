@@ -5,14 +5,15 @@
   "author": "Matt Parizeau",
   "license": "ISC",
   "scripts": {
-      "start": "node main.js",
-      "format": "node main.js -f"
+    "start": "node main.js",
+    "format": "node main.js -f html"
   },
   "dependencies": {
     "async": "^1.4.2",
     "cheerio": "^0.19.0",
     "moment": "^2.10.6",
     "request": "^2.62.0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "yargs": "^3.26.0"
   }
 }

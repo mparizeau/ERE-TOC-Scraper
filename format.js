@@ -2,6 +2,15 @@ var _ = require('underscore');
 var cheerio = require('cheerio');
 var moment = require('moment');
 
+_.templateSettings = {
+  interpolate: /\{\{(.+?)\}\}/g
+};
+
+var wikiTemplate = {
+  monthTitle: _.template("'''{{month}}'''"),
+  post: _.template("{{day}} - [{{link}}/ {{title}}]")
+};
+
 function getPostHTML(postData) {
   return postData.map(function(post) {
     return cheerio('<a>')
@@ -9,6 +18,12 @@ function getPostHTML(postData) {
       .attr('href', post.link)
       .text(post.title);
   });  
+}
+
+function getGroupedByMonth(postData) {
+  return _.groupBy(postData, function(post) {
+    return moment(post.originallyPosted).format('MMMM YYYY');
+  });
 }
 
 module.exports = {
@@ -45,9 +60,7 @@ module.exports = {
   },
 
   getHTML: function(postData) {
-    var groupedPosts = _.groupBy(postData, function(post) {
-      return moment(post.originallyPosted).format('MMMM YYYY');
-    });
+    var groupedPosts = getGroupedByMonth(postData);
 
     var finalHTML = cheerio('<html>');
     var bodyHTML = cheerio('<body>');
@@ -66,5 +79,24 @@ module.exports = {
     }
 
     return cheerio.html(finalHTML);
+  },
+
+  getWikiMarkup: function(postData) {
+    var groupedPosts = getGroupedByMonth(postData.reverse());
+
+    var finalText = '';
+    for (var month in groupedPosts) {
+      finalText += wikiTemplate.monthTitle({month: month}) + '\n\n';
+
+      finalText += groupedPosts[month].reduce(function(previous, post) {
+        return previous + wikiTemplate.post({
+          day: moment(post.originallyPosted).format('Do'),
+          link: post.link,
+          title: post.title
+        }) + '\n\n';
+      }, '');
+    }
+
+    return finalText;
   }
 };
