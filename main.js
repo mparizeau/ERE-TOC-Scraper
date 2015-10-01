@@ -20,6 +20,8 @@ switch(argv.f) {
   case 'wiki':
     var wikiText = format.getWikiMarkup(postData);
     fs.writeFileSync('wiki-results.txt', wikiText);
+    var wikiTextByCount = format.getWikiMarkupByLength(postData);
+    fs.writeFileSync('wiki-bycount.txt', wikiTextByCount);
     break;
   default:
     getData(function(postData) {

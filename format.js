@@ -8,7 +8,8 @@ _.templateSettings = {
 
 var wikiTemplate = {
   monthTitle: _.template("'''{{month}}'''"),
-  post: _.template("{{day}} - [{{link}}/ {{title}}]")
+  post: _.template("{{day}} - [{{link}}/ {{title}}]"),
+  wordPost: _.template("{{count}} words - [{{link}}/ {{title}}]")
 };
 
 function getPostHTML(postData) {
@@ -30,7 +31,7 @@ module.exports = {
   parseHTML: function(body) {
     var $ = cheerio.load(body);
     var posts = [];
-    $('.post-meta').each(function(i, element) {
+    $('.post-meta').each(function() {
       var $this = $(this);
       // id is of the form post-XXXX
       var postId = $this.attr('id').split('-')[1];
@@ -48,10 +49,18 @@ module.exports = {
         postDate = new Date(postDateString);
       }
 
+      var content = $this.find('.post-content').children('p, table, li, blockquote');
+      if (originallyPosted !== '') {
+        content = content.slice(0, content.length - 1);
+      }
+      var matches = content.text().match(/\S+/g);
+      var wordCount = matches ? matches.length : 0;
+
       posts.push({
         title: titleLink.attr('title'),
         link: titleLink.attr('href'),
         originallyPosted: postDate,
+        wordCount: wordCount,
         id: postId
       });
     });
@@ -98,5 +107,19 @@ module.exports = {
     }
 
     return finalText;
+  },
+
+  getWikiMarkupByLength: function(postData) {
+    var sortedPosts = postData.sort(function(a, b) {
+      return b.wordCount - a.wordCount;
+    });
+
+    return sortedPosts.reduce(function(previous, post) {
+      return previous + wikiTemplate.wordPost({
+        count: post.wordCount,
+        link: post.link,
+        title: post.title
+      }) + '\n\n';
+    }, '');
   }
 };
