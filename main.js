@@ -22,6 +22,8 @@ switch(argv.f) {
     fs.writeFileSync('wiki-results.txt', wikiText);
     var wikiTextByCount = format.getWikiMarkupByLength(postData);
     fs.writeFileSync('wiki-bycount.txt', wikiTextByCount);
+    var wikiTextByEffectiveCount = format.getWikiMarkupByEffectiveLength(postData);
+    fs.writeFileSync('wiki-by-effectivecount.txt', wikiTextByEffectiveCount);
     break;
   default:
     getData(function(postData) {

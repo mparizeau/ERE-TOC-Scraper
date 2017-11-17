@@ -9,7 +9,7 @@ _.templateSettings = {
 var wikiTemplate = {
   monthTitle: _.template("'''{{month}}'''"),
   post: _.template("{{day}} - [{{link}}/ {{title}}]"),
-  wordPost: _.template("{{count}} words - [{{link}}/ {{title}}]")
+  wordPost: _.template("{{count}} words - [{{link}}/ {{title}}]"),
 };
 
 function getPostHTML(postData) {
@@ -56,11 +56,14 @@ module.exports = {
       var matches = content.text().match(/\S+/g);
       var wordCount = matches ? matches.length : 0;
 
+      var imageCount = $this.find('.post-content img').length;
+
       posts.push({
         title: titleLink.attr('title'),
         link: titleLink.attr('href'),
         originallyPosted: postDate,
         wordCount: wordCount,
+        imageCount: imageCount,
         id: postId
       });
     });
@@ -117,6 +120,24 @@ module.exports = {
     return sortedPosts.reduce(function(previous, post) {
       return previous + wikiTemplate.wordPost({
         count: post.wordCount,
+        link: post.link,
+        title: post.title
+      }) + '\n\n';
+    }, '');
+  },
+
+  getWikiMarkupByEffectiveLength: function(postData) {
+    var effectiveCount = function(post) {
+      return post.imageCount * 1000 + post.wordCount;
+    }
+
+    var sortedPosts = postData.sort(function(a, b) {
+      return effectiveCount(b) - effectiveCount(a);
+    });
+
+    return sortedPosts.reduce(function(previous, post) {
+      return previous + wikiTemplate.wordPost({
+        count: effectiveCount(post),
         link: post.link,
         title: post.title
       }) + '\n\n';
